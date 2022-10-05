@@ -1,19 +1,19 @@
-import { AsyncStorage } from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const setFirstTimeUse = () => {
-    AsyncStorage.setItem("isFirstTimeUse","true");
-}
+  return AsyncStorage.setItem('isFirstTimeUse', 'true');
+};
 
 const getFirstTimeUse = () => {
-   return AsyncStorage.getItem("isFirstTimeUse");
-}
+  return AsyncStorage.getItem('isFirstTimeUse');
+};
 
-const setToken = (token) => {
-    AsyncStorage.setItem("token",token);
-}
+const setToken = token => {
+  return AsyncStorage.setItem('token', token);
+};
 
 const getToken = () => {
-   return AsyncStorage.getItem("token");
-}
+  return AsyncStorage.getItem('token');
+};
 
-export {setFirstTimeUse,getFirstTimeUse,setToken,getToken};
+export default {setFirstTimeUse, getFirstTimeUse, setToken, getToken};

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {
@@ -11,50 +11,58 @@ import {
   VerificationScreen,
   HomeScreen,
 } from '../screens';
-import {connect} from 'react-redux';
-// import { useSelector,useDispatch } from 'react-redux'
-import {SET_IS_APP_LOADING,SET_TOKEN,SET_FIRST_TIME_USE} from '../redux-toolkit/GeneralSlice';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  SET_IS_APP_LOADING,
+  SET_TOKEN,
+  SET_FIRST_TIME_USE,
+} from '../redux-toolkit/GeneralSlice';
+import {GeneralAction} from '../actions';
 
 const Stack = createStackNavigator();
 
-const Navigators = ({token}) => {
-  console.log(token);
+const Navigators = () => {
+  const {isAppLoading, token, isFirstTimeUse} = useSelector(
+    state => state?.generalState,
+  );
 
-  // const value = useSelector((state) => {
-  //   return state
-  // });
+  useEffect(() => {
+    dispatch(GeneralAction.appStart());
+  }, []);
 
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        {
-          !token ? (
-            <>
-            <Stack.Screen name="Splash" component={SplashScreen} />
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        {isAppLoading ? (
+          <Stack.Screen name="Splash" component={SplashScreen} />
+        ) : !token || token === null || token === '' ? (
+          <>
+            {isFirstTimeUse && (
+              <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            )}
             <Stack.Screen name="Signin" component={SigninScreen} />
             <Stack.Screen name="Signup" component={SignupScreen} />
-            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-            <Stack.Screen name="RegisterPhoneScreen" component={RegisterPhoneScreen}/>
-            <Stack.Screen name="VerificationScreen" component={VerificationScreen}/>
-            </>
-          )
-          :
-          (
-            <Stack.Screen name="HomeScreen" component={HomeScreen} />
-          )
-        }
+            <Stack.Screen
+              name="ForgotPassword"
+              component={ForgotPasswordScreen}
+            />
+            <Stack.Screen
+              name="RegisterPhoneScreen"
+              component={RegisterPhoneScreen}
+            />
+            <Stack.Screen
+              name="VerificationScreen"
+              component={VerificationScreen}
+            />
+          </>
+        ) : (
+          <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-const mapStateToProps = state => {
-  return {
-    token: state.generalState.token,
-  };
-};
-
-export default connect(mapStateToProps)(Navigators);
+export default Navigators;

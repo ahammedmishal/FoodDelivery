@@ -11,14 +11,17 @@ import {
 import {Separator, ToggleButton} from '../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
-import { Colors, Fonts, Images } from '../constants';
+import {Colors, Fonts, Images} from '../constants';
 import {Display} from '../utils';
 import LottieView from 'lottie-react-native';
-import {connect} from 'react-redux';
 import {GeneralAction} from '../actions';
-import { AuthenticationService } from '../services';
-import { useSelector,useDispatch } from 'react-redux'
-import {SET_IS_APP_LOADING,SET_TOKEN,SET_FIRST_TIME_USE} from '../redux-toolkit/GeneralSlice';
+import {AuthenticationService, StorageService} from '../services';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  SET_IS_APP_LOADING,
+  SET_TOKEN,
+  SET_FIRST_TIME_USE,
+} from '../redux-toolkit/GeneralSlice';
 
 const SigninScreen = ({navigation, setToken}) => {
   const [isPasswordShow, setIsPasswordShow] = useState(false);
@@ -31,7 +34,7 @@ const SigninScreen = ({navigation, setToken}) => {
   //   return state.value
   // });
 
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const signIn = async () => {
     setIsLoading(true);
@@ -41,9 +44,11 @@ const SigninScreen = ({navigation, setToken}) => {
     };
     AuthenticationService.login(user).then(response => {
       setIsLoading(false);
-      setToken(response?.data);
-      
-      if (!response?.status) {
+      if (response?.status) {
+          StorageService.setToken(response?.data).then(() =>{
+            dispatch(GeneralAction.setToken(response?.data))
+          })
+      }else{
         setErrorMessage(response?.message);
       }
     });
@@ -336,10 +341,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapDispatchToProps = dispatch => {
-  return {
-    setToken: token => dispatch(GeneralAction.setToken(token)),
-  };
-};
-
-export default connect(null, mapDispatchToProps)(SigninScreen);
+export default SigninScreen;
